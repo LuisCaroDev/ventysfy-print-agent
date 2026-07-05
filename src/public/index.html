@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="es" data-theme="light">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ventysfy Print Agent</title>
+  <link rel="stylesheet" href="/assets/app.generated.css" />
+</head>
+<body class="agent-body">
+  <div class="shell">
+    <aside class="agent-hero">
+      <div class="agent-hero__inner">
+        <p class="eyebrow">Ventysfy Print Agent</p>
+        <h1 class="agent-hero__title">Administra las impresoras desde una sola PC.</h1>
+        <p class="agent-hero__copy">
+          Instala el agente en la computadora que puede usar las impresoras. Desde aqui copias el host y el token para el POS, y gestionas todas las impresoras del local.
+        </p>
+        <div class="agent-hero__tips">
+          <div class="alert agent-hero-tip agent-hero-tip--accent">
+            <span>Copia el host y el token de esta ventana, luego pegalos en la configuracion de impresion del POS.</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="content">
+      <section class="card panel">
+        <div class="card-body gap-5">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Estado del agente</p>
+              <h2 class="panel__title">Conexion con el POS</h2>
+            </div>
+            <button class="btn btn-outline btn-sm" id="refresh-status">Actualizar</button>
+          </div>
+          <div id="status-grid" class="status-grid"></div>
+        </div>
+      </section>
+
+      <section class="card panel">
+        <div class="card-body gap-5">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Impresoras</p>
+              <h2 class="panel__title">CRUD y pruebas</h2>
+            </div>
+            <button class="btn btn-primary" id="add-printer">Agregar impresora</button>
+          </div>
+          <div id="printer-list" class="printer-list"></div>
+        </div>
+      </section>
+
+      <section class="card panel">
+        <div class="card-body gap-5">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Deteccion</p>
+              <h2 class="panel__title">Buscar impresoras</h2>
+            </div>
+          </div>
+          <div class="discovery-actions">
+            <button class="btn btn-outline" data-discovery="network">Escanear red LAN</button>
+            <button class="btn btn-outline" data-discovery="usb">Detectar USB</button>
+            <button class="btn btn-outline" data-discovery="bluetooth">Detectar Bluetooth</button>
+          </div>
+          <div id="discovery-results" class="discovery-results"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <dialog id="printer-dialog" class="modal">
+    <form method="dialog" class="modal-box printer-modal" id="printer-form">
+      <div class="dialog__header">
+        <div>
+          <p class="eyebrow">Configuracion</p>
+          <h2 class="panel__title" id="dialog-title">Agregar impresora</h2>
+        </div>
+        <button class="btn btn-ghost btn-circle btn-sm" value="cancel" type="button" id="close-dialog">✕</button>
+      </div>
+
+      <div class="form-grid">
+        <label class="form-control">
+          <span class="label-text">Nombre</span>
+          <input class="input input-bordered w-full" name="nombre" required />
+        </label>
+        <label class="form-control">
+          <span class="label-text">Tipo</span>
+          <select class="select select-bordered w-full" name="tipo" id="field-tipo">
+            <option value="network">Red / Ethernet / Wi-Fi</option>
+            <option value="usb">USB</option>
+            <option value="bluetooth">Bluetooth / Serial</option>
+          </select>
+        </label>
+        <label class="form-control">
+          <span class="label-text">Ancho</span>
+          <select class="select select-bordered w-full" name="anchoMm">
+            <option value="80">80 mm</option>
+            <option value="58">58 mm</option>
+          </select>
+        </label>
+        <label class="field-toggle">
+          <input class="toggle toggle-primary" type="checkbox" name="abreCajon" />
+          <span>Esta impresora abre cajon</span>
+        </label>
+        <label class="field-toggle">
+          <input class="toggle toggle-primary" type="checkbox" name="enabled" checked />
+          <span>Impresora habilitada</span>
+        </label>
+      </div>
+
+      <details class="advanced-options">
+        <summary class="advanced-options__summary">Opciones avanzadas</summary>
+        <div class="advanced-options__body">
+          <label class="form-control">
+            <span class="label-text">Codepage</span>
+            <select class="select select-bordered w-full" name="codepage">
+              <option value="CP850">CP850</option>
+              <option value="CP437">CP437</option>
+              <option value="CP858">CP858</option>
+              <option value="CP860">CP860</option>
+              <option value="CP863">CP863</option>
+              <option value="CP865">CP865</option>
+              <option value="CP866">CP866</option>
+              <option value="WINDOWS-1252">Windows-1252</option>
+            </select>
+          </label>
+          <p class="muted">Dejalo en CP850 salvo que una impresora imprima mal acentos, eñes o simbolos.</p>
+        </div>
+      </details>
+
+      <div id="network-fields" class="type-fields">
+        <h3 class="type-fields__title">Conexion de red</h3>
+        <div class="form-grid">
+          <label class="form-control">
+            <span class="label-text">IP / Host</span>
+            <input class="input input-bordered w-full" name="host" placeholder="192.168.18.200" />
+          </label>
+          <label class="form-control">
+            <span class="label-text">Puerto</span>
+            <input class="input input-bordered w-full" name="port" type="number" value="9100" />
+          </label>
+        </div>
+      </div>
+
+      <div id="usb-fields" class="type-fields hidden">
+        <h3 class="type-fields__title">Conexion USB</h3>
+        <div class="form-grid">
+          <label class="form-control">
+            <span class="label-text">Vendor ID</span>
+            <input class="input input-bordered w-full" name="vendorId" placeholder="0x04b8" />
+          </label>
+          <label class="form-control">
+            <span class="label-text">Product ID</span>
+            <input class="input input-bordered w-full" name="productId" placeholder="0x0202" />
+          </label>
+          <label class="form-control">
+            <span class="label-text">Serial number</span>
+            <input class="input input-bordered w-full" name="serialNumber" />
+          </label>
+          <label class="form-control">
+            <span class="label-text">Nombre del sistema</span>
+            <input class="input input-bordered w-full" name="systemPrinter" placeholder="Opcional" />
+          </label>
+        </div>
+        <div class="alert alert-warning mt-4 text-sm">
+          <span>En Windows puede ser necesario instalar WinUSB con Zadig para acceso directo.</span>
+        </div>
+      </div>
+
+      <div id="bluetooth-fields" class="type-fields hidden">
+        <h3 class="type-fields__title">Conexion Bluetooth / Serial</h3>
+        <div class="form-grid">
+          <label class="form-control">
+            <span class="label-text">Puerto / Path</span>
+            <input class="input input-bordered w-full" name="path" placeholder="COM5 o /dev/tty.Bluetooth..." />
+          </label>
+          <label class="form-control">
+            <span class="label-text">Baud rate</span>
+            <select class="select select-bordered w-full" name="baudRate">
+              <option value="9600">9600</option>
+              <option value="19200">19200</option>
+              <option value="38400">38400</option>
+              <option value="57600">57600</option>
+              <option value="115200">115200</option>
+            </select>
+          </label>
+          <label class="form-control">
+            <span class="label-text">Canal / referencia</span>
+            <input class="input input-bordered w-full" name="channel" placeholder="Opcional" />
+          </label>
+        </div>
+        <div class="alert mt-4 text-sm">
+          <span>Primero empareja la impresora con el sistema operativo; luego prueba distintos baud rates si no imprime.</span>
+        </div>
+      </div>
+
+      <div class="dialog__actions">
+        <button type="button" class="btn btn-ghost" id="cancel-dialog">Cancelar</button>
+        <button type="submit" class="btn btn-primary">Guardar impresora</button>
+      </div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast-shell hidden"></div>
+  <script src="/assets/app.js" defer></script>
+</body>
+</html>
