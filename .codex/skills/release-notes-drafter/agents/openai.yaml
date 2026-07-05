@@ -1,0 +1,4 @@
+interface:
+  display_name: "Release Notes Drafter"
+  short_description: "Draft concise release text for Ventysfy Print Agent"
+  default_prompt: "Draft concise release notes or release-body text for Ventysfy Print Agent. Prefer ready-to-paste Markdown, minimal explanation, and include version/tag context when available."

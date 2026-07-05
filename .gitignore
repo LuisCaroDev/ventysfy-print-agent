@@ -1,0 +1,8 @@
+node_modules
+dist
+config.json
+*.log
+.DS_Store
+src/public/app.generated.css
+build/icon.icns
+build/icon.mac-source.png
