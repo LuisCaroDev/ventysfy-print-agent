@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "port": 9977,
+  "token": "cambia-este-token",
+  "printers": [
+    {
+      "id": "caja-principal",
+      "nombre": "Caja principal",
+      "tipo": "network",
+      "anchoMm": 80,
+      "codepage": "CP850",
+      "abreCajon": true,
+      "enabled": true,
+      "connection": {
+        "host": "192.168.1.87",
+        "port": 9100
+      }
+    },
+    {
+      "id": "barra-usb",
+      "nombre": "Barra USB",
+      "tipo": "usb",
+      "anchoMm": 80,
+      "codepage": "CP850",
+      "abreCajon": false,
+      "enabled": true,
+      "connection": {
+        "vendorId": "0x04b8",
+        "productId": "0x0202"
+      }
+    },
+    {
+      "id": "barra-bt",
+      "nombre": "Barra Bluetooth",
+      "tipo": "bluetooth",
+      "anchoMm": 80,
+      "codepage": "CP850",
+      "abreCajon": false,
+      "enabled": true,
+      "connection": {
+        "path": "COM5",
+        "baudRate": 9600
+      }
+    }
+  ]
+}
